@@ -9,5 +9,5 @@ perl:
   - "5.10"
   - "5.8"
 script:
-  - prove -l t
+  - prove -l t xt
 sudo: false
