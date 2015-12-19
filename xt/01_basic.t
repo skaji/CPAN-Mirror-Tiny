@@ -8,8 +8,8 @@ my $base = tempdir CLEANUP => 1;
 my $cpan = CPAN::Mirror::Tiny->new($base);
 $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
 $cpan->inject('https://github.com/shoichikaji/Carl.git', {ref => "9188c0e4", author => "SKAJI"});
-$cpan->write_packages_details(compress => 1);
-$cpan->write_packages_details;
+$cpan->write_index(compress => 1);
+$cpan->write_index;
 
 for my $file (qw(
     authors/id/V/VE/VENDOR/App-cpm-0.112.tar.gz

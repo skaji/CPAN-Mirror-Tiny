@@ -154,11 +154,11 @@ sub extract_provides {
     [map +{ package => $_, version => $hash->{$_}{version} }, sort keys %$hash];
 }
 
-sub write_index {
-    my ($self, $fh) = @_;
-    my @collect;
+sub index {
+    my $self = shift;
     my $base = $self->base("authors/id");
     return unless -d $base;
+    my @collect;
     my $wanted = sub {
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
@@ -172,20 +172,21 @@ sub write_index {
         }
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
-    printf {$fh} "Written-By: %s %s\n\n", ref $self, $self->VERSION;
+    my @line;
     for my $p (sort { $a->{package} cmp $b->{package} } @collect) {
-        printf {$fh} "%-36s %-8s %s\n",
-            $p->{package}, $p->{version}, $p->{path};
+        push @line, sprintf "%-36s %-8s %s\n", $p->{package}, $p->{version}, $p->{path};
     }
+    join '', @line;
 }
 
-sub write_packages_details {
+sub write_index {
     my ($self, %option) = @_;
     my $file = $self->base("modules", "02packages.details.txt");
     my $dir  = File::Basename::dirname($file);
     File::Path::mkpath($dir) unless -d $dir;
     open my $fh, ">", "$file.tmp" or die "Couldn't open $file: $!";
-    $self->write_index($fh);
+    printf {$fh} "Written-By: %s %s\n\n", ref $self, $self->VERSION;
+    print {$fh} $self->index;
     close $fh;
     if ($option{compress}) {
         my ($ok, $error) = $self->_system("gzip --stdout --no-name $file.tmp > $file.gz");
@@ -220,7 +221,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (aka DarkPAN)
 
   $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
   $cpan->inject("https://github.com/shoichikaji/Carl.git");
-  $cpan->write_packages_details(compress => 1);
+  $cpan->write_index(compress => 1);
 
   # $ find repository -type f
   # repository/authors/id/V/VE/VENDOR/App-cpm-0.112.tar.gz
