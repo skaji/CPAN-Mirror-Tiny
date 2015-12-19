@@ -92,7 +92,7 @@ sub _system {
 
 sub inject {
     my ($self, $url, $option) = @_;
-    if ($url =~ /(?:^git:|\.git(?:@.+)?$)/) {
+    if ($url =~ /(?:^git:|\.git$)/) {
         $self->inject_git($url, $option);
     } else {
         $self->inject_http($url, $option);
@@ -118,14 +118,14 @@ sub inject_http {
 sub inject_git {
     my ($self, $url, $option) = @_;
     my $author = ($option ||= {})->{author} || "VENDOR";
+    my $ref    = ($option ||= {})->{ref};
     my $tempdir = $self->tempdir;
-    ($url, my $commitish) = split /(?<=\.git)@/i, $url, 2;
     my ($ok, $error) = $self->_system("git", "clone", $url, $tempdir);
     die "Couldn't git clone $url: $error" unless $ok;
     my $guard = File::pushd::pushd($tempdir);
-    if ($commitish) {
-        my ($ok, $error) = $self->_system("git", "checkout", $commitish);
-        die "Couldn't git checkout $commitish: $error" unless $ok;
+    if ($ref) {
+        my ($ok, $error) = $self->_system("git", "checkout", $ref);
+        die "Couldn't git checkout $ref: $error" unless $ok;
     }
     my $metafile = "META.json";
     die "Couldn't find $metafile in $url" unless -f $metafile;
