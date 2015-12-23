@@ -2,10 +2,6 @@ package CPAN::Mirror::Tiny::Archive;
 use strict;
 use warnings;
 
-# Almost copy from https://github.com/miyagawa/cpanminus
-# Copyright 2010- Tatsuhiko Miyagawa
-# LICENSE: This software is licensed under the same terms as Perl.
-
 use File::Which 'which';
 use constant BAD_TAR => ($^O eq 'solaris' || $^O eq 'hpux');
 use constant WIN32 => $^O eq 'MSWin32';
@@ -149,3 +145,19 @@ sub _init {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+CPAN::Mirror::Tiny::Archive - untar/unzip archives
+
+=head1 LICENSE
+
+Most of code is copied from L<App::cpanminus>. Its license is:
+
+  Copyright 2010- Tatsuhiko Miyagawa
+
+  This software is licensed under the same terms as Perl.
+
+=cut

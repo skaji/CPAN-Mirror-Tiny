@@ -7,6 +7,7 @@ our $VERSION = '0.01';
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;
+use CPAN::Mirror::Tiny::Tempdir;
 use Capture::Tiny ();
 use Cwd ();
 use File::Basename ();
@@ -14,23 +15,22 @@ use File::Copy ();
 use File::Path ();
 use File::Spec;
 use File::Temp ();
-use File::pushd ();
 use HTTP::Tinyish;
 use Parse::LocalDistribution;
 
 sub new {
-    my $class = shift;
-    my $base  = shift or die "Missing base directory argument";
+    my ($class, %option) = @_;
+    my $base  = $option{base} or die "Missing base directory argument";
+    my $tempdir = $option{tempdir} || File::Temp::tempdir(CLEANUP => 1);
     File::Path::mkpath($base) unless -d $base;
     $base = Cwd::abs_path($base);
     my $archive = CPAN::Mirror::Tiny::Archive->new;
     my $http = HTTP::Tinyish->new;
-    my $workdir = File::Temp::tempdir(CLEANUP => 1);
     bless {
         base => $base,
         archive => $archive,
         http => $http,
-        workdir => $workdir,
+        tempdir => $tempdir,
     }, $class;
 }
 
@@ -39,34 +39,18 @@ sub http { shift->{http} }
 
 sub extract {
     my ($self, $path) = @_;
-    if ($path =~ /\.zip$/) {
-        $self->archive->unzip($path);
-    } else {
-        $self->archive->untar($path);
-    }
+    my $method = $path =~ /\.zip$/ ? "unzip" : "untar";
+    $self->archive->$method($path);
 }
 
 sub base {
     my $self = shift;
-    my $base = $self->{base};
-    if (@_) {
-        File::Spec->catdir($base, @_);
-    } else {
-        $base;
-    }
+    return $self->{base} unless @_;
+    File::Spec->catdir($self->{base}, @_);
 }
 
-sub workdir {
-    my $self = shift;
-    return $self->{workdir} unless @_;
-    File::Spec->catdir($self->{workdir}, @_);
-}
-
-sub tempdir {
-    my $self = shift;
-    my $workdir = $self->workdir;
-    File::Temp::tempdir(CLEANUP => 0, DIR => $workdir);
-}
+sub tempdir { CPAN::Mirror::Tiny::Tempdir->new(shift->{tempdir}) }
+sub pushd_tempdir { CPAN::Mirror::Tiny::Tempdir->pushd(shift->{tempdir}) }
 
 sub _author_dir {
     my ($self, $author) = @_;
@@ -92,24 +76,34 @@ sub _system {
 
 sub inject {
     my ($self, $url, $option) = @_;
-    if ($url =~ /(?:^git:|\.git$)/) {
-        $self->inject_git($url, $option);
-    } else {
+    if ($url =~ /(?:^git:|\.git(?:@(.+))?$)/) {
+        my $ref = $1;
+        $self->inject_git( $url, { %{$option || +{}}, ref => $ref } );
+    } elsif ($url =~ /^https?:/) {
         $self->inject_http($url, $option);
+    } else {
+        $url =~ s{^file://}{};
+        $self->inject_local($url, $option);
     }
+}
+
+sub inject_local {
+    my ($self, $file, $option) = @_;
+    my $author = ($option ||= {})->{author} || "VENDOR";
+    $self->_locate_tarball($file, $author);
 }
 
 sub inject_http {
     my ($self, $url, $option) = @_;
-    my $author = ($option ||= {})->{author} || "VENDOR";
     if ($url !~ /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/) {
         die "URL must be tarball or zipball\n";
     }
     my $basename = File::Basename::basename($url);
-    my $file = $self->workdir($basename);
+    my $tempdir = $self->tempdir;
+    my $file = "$tempdir/$basename";
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
-        return $self->_locate_tarball($file, $author);
+        return $self->inject_local($file, $option);
     } else {
         die "Couldn't get $url: $res->{status} $res->{reason}";
     }
@@ -117,12 +111,10 @@ sub inject_http {
 
 sub inject_git {
     my ($self, $url, $option) = @_;
-    my $author = ($option ||= {})->{author} || "VENDOR";
-    my $ref    = ($option ||= {})->{ref};
-    my $tempdir = $self->tempdir;
-    my ($ok, $error) = $self->_system("git", "clone", $url, $tempdir);
+    my $ref = ($option ||= {})->{ref};
+    my $guard = $self->pushd_tempdir;
+    my ($ok, $error) = $self->_system("git", "clone", $url, ".");
     die "Couldn't git clone $url: $error" unless $ok;
-    my $guard = File::pushd::pushd($tempdir);
     if ($ref) {
         my ($ok, $error) = $self->_system("git", "checkout", $ref);
         die "Couldn't git checkout $ref: $error" unless $ok;
@@ -136,7 +128,7 @@ sub inject_git {
         "git archive --format=tar --prefix=$distvname/ HEAD | gzip > $distvname.tar.gz"
     );
     if ($ok && -f "$distvname.tar.gz") {
-        return $self->_locate_tarball("$distvname.tar.gz", $author);
+        return $self->inject_local("$distvname.tar.gz", $option);
     } else {
         die "Couldn't archive $url: $error";
     }
@@ -147,7 +139,7 @@ sub extract_provides {
     unless (File::Spec->file_name_is_absolute($path)) {
         $path = Cwd::abs_path($path);
     }
-    my $gurad = File::pushd::pushd($self->tempdir);
+    my $gurad = $self->pushd_tempdir;
     my $dir = $self->extract($path) or return;
     my $parser = Parse::LocalDistribution->new({ALLOW_DEV_VERSION => 1});
     my $hash = $parser->parse($dir) || +{};

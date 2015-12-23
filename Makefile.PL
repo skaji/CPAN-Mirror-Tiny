@@ -13,6 +13,9 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "CPAN-Mirror-Tiny",
+  "EXE_FILES" => [
+    "script/cpan-mirror-server"
+  ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.008001",
   "NAME" => "CPAN::Mirror::Tiny",

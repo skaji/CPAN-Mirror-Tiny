@@ -36,6 +36,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Plack" : "0"
+         },
          "requires" : {
             "CPAN::Meta" : "0",
             "Capture::Tiny" : "0",

@@ -7,6 +7,8 @@ requires 'File::pushd';
 requires 'HTTP::Tinyish';
 requires 'Parse::LocalDistribution';
 
+recommends 'Plack';
+
 on test => sub {
     requires 'Test::More', '0.98';
 };

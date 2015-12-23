@@ -1,0 +1,31 @@
+#!perl
+use strict;
+use warnings;
+use CPAN::Mirror::Tiny::Server;
+
+CPAN::Mirror::Tiny::Server->start(@ARGV);
+
+__END__
+
+=head1 SYNOPSIS
+
+  $ cpan-mirror-server [base directory]
+
+  Options are the same as plackup. Type `perldoc plackup` for the details.
+  ex: --port, --host, --server, --env, ...
+
+  Examples:
+
+  # stat
+  $ cpan-mirror-server ./repository
+  $ cpan-mirror-server --port 8080 --server Starman ./repository
+
+  # upload
+  $ curl --data-urlencode 'module=git://github.com/shoichikaji/Carl.git' \
+    --data-urlencode 'author=SKAJI' http://localhost:5000/upload
+
+  # install
+  $ cpanm --mirror=http://localhost:5000 Carl
+
+=cut
+
