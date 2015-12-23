@@ -77,8 +77,7 @@ sub _system {
 sub inject {
     my ($self, $url, $option) = @_;
     if ($url =~ /(?:^git:|\.git(?:@(.+))?$)/) {
-        my $ref = $1;
-        $self->inject_git( $url, { %{$option || +{}}, ref => $ref } );
+        $self->inject_git($url, { %{$option || +{}}, $1 ? (ref => $1) :() });
     } elsif ($url =~ /^https?:/) {
         $self->inject_http($url, $option);
     } else {
@@ -181,12 +180,14 @@ sub write_index {
     print {$fh} $self->index;
     close $fh;
     if ($option{compress}) {
-        my ($ok, $error) = $self->_system("gzip --stdout --no-name $file.tmp > $file.gz");
+        my ($ok, $error) = $self->_system("gzip --stdout --no-name $file.tmp > $file.gz.tmp");
         if ($ok) {
+            rename "$file.gz.tmp", "$file.gz"
+                or die "Couldn't rename $file.gz.tmp to $file.gz: $!";
             unlink "$file.tmp";
             return "$file.gz";
         } else {
-            unlink $_ for "$file.tmp", "$file.gz";
+            unlink $_ for "$file.tmp", "$file.gz.tmp";
             return;
         }
     } else {
