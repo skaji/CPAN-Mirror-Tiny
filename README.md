@@ -11,7 +11,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
     my $cpan = CPAN::Mirror::Tiny->new(base => "./repository");
 
     $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
-    $cpan->inject("https://github.com/shoichikaji/Carl.git");
+    $cpan->inject("https://github.com/skaji/Carl.git");
     $cpan->write_index(compress => 1);
 
     # $ find repository -type f
@@ -30,7 +30,7 @@ Yes, we already have great CPAN modules which create CPAN mirror.
 [CPAN::Mini](https://metacpan.org/pod/CPAN::Mini), [OrePAN2](https://metacpan.org/pod/OrePAN2), [WorePAN](https://metacpan.org/pod/WorePAN) ...
 
 I want to use such modules in CPAN clients.
-Actually I used OrePAN2 in [Carl](https://github.com/shoichikaji/Carl),
+Actually I used OrePAN2 in [Carl](https://github.com/skaji/Carl),
 which can install modules in github.com or any servers.
 
 Then minimal dependency and no dependency on XS modules is critical.
@@ -68,14 +68,14 @@ Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 
         $cpan->inject('git://github.com/skaji/Carl.git@0.114', { author => "SKAJI" });
 
-As above examples shows, you can specify `author` in `\%option`.
+As seeing from the above examples, you can specify `author` in `\%option`.
 If you omit `author`, default `VENDOR` is used.
 
-### \* `my $index_string = $cpan->index`
+### `my $index_string = $cpan->index`
 
 Get the index (a.k.a. 02packages.details.txt) of our cpan mirror.
 
-### \* `$cpan->write_index( compress => bool )`
+### `$cpan->write_index( compress => bool )`
 
 Write the index to ` $base/modules/02packages.details.txt `
 or ` base/modules/02packages.details.txt.gz `.

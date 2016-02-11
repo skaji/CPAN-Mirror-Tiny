@@ -20,7 +20,7 @@ __END__
   $ cpan-mirror-server --port 8080 --server Starman ./repository
 
   # upload
-  $ curl --data-urlencode 'module=git://github.com/shoichikaji/Carl.git' \
+  $ curl --data-urlencode 'module=git://github.com/skaji/Carl.git' \
     --data-urlencode 'author=SKAJI' http://localhost:5000/upload
 
   # install
