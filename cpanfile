@@ -9,6 +9,6 @@ requires 'Parse::LocalDistribution';
 
 recommends 'Plack';
 
-on test => sub {
+on develop => sub {
     requires 'Test::More', '0.98';
 };

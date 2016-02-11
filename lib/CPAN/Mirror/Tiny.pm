@@ -145,6 +145,7 @@ sub extract_provides {
     [map +{ package => $_, version => $hash->{$_}{version} }, sort keys %$hash];
 }
 
+# TODO cache
 sub index {
     my $self = shift;
     my $base = $self->base("authors/id");
@@ -202,15 +203,17 @@ __END__
 
 =encoding utf-8
 
+=for stopwords DarkPAN OrePAN2 tempdir commitish
+
 =head1 NAME
 
-CPAN::Mirror::Tiny - create partial CPAN mirror (aka DarkPAN)
+CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
 =head1 SYNOPSIS
 
   use CPAN::Mirror::Tiny;
 
-  my $cpan = CPAN::Mirror::Tiny->new("./repository");
+  my $cpan = CPAN::Mirror::Tiny->new(base => "./repository");
 
   $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
   $cpan->inject("https://github.com/shoichikaji/Carl.git");
@@ -225,7 +228,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (aka DarkPAN)
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
 
-=head1 WHY NEW?
+=head2 WHY NEW?
 
 Yes, we already have great CPAN modules which create CPAN mirror.
 
@@ -236,13 +239,63 @@ Actually I used OrePAN2 in L<Carl|https://github.com/shoichikaji/Carl>,
 which can install modules in github.com or any servers.
 
 Then minimal dependency and no dependency on XS modules is critical.
-Unfortunately existing CPAN mirorr modules depend on XS modules.
+Unfortunately existing CPAN mirror modules depend on XS modules.
 
-That is why I made CPAN::Mirror::Tiny.
+This is why I made CPAN::Mirror::Tiny.
+
+=head2 METHODS
+
+=head3 C<< my $cpan = CPAN::Mirror::Tiny->new(%option) >>
+
+Constructor. C< %option > may be:
+
+=over 4
+
+=item * base
+
+Base directory for cpan mirror. This is required.
+
+=item * tempdir
+
+Temp directory. Default C<< File::Temp::tempdir(CLEANUP => 1) >>.
+
+=back
+
+=head3 C<< $cpan->inject($source, \%option) >>
+
+Inject C< $source > to our cpan mirror directory. C< $source > is one of
+
+=over 4
+
+=item * local tar.gz path
+
+  $cpan->inject('/path/to/Module.tar.gz', { author => "SKAJI" });
+
+=item * http url of tar.gz
+
+  $cpan->inject('http://example.com/Module.tar.gz', { author => "DUMMY" });
+
+=item * git url (with optional commitish)
+
+  $cpan->inject('git://github.com/skaji/Carl.git@0.114', { author => "SKAJI" });
+
+=back
+
+As above examples shows, you can specify C<author> in C<\%option>.
+If you omit C<author>, default C<VENDOR> is used.
+
+=head3 * C<< my $index_string = $cpan->index >>
+
+Get the index (a.k.a. 02packages.details.txt) of our cpan mirror.
+
+=head3 * C<< $cpan->write_index( compress => bool ) >>
+
+Write the index to C< $base/modules/02packages.details.txt >
+or C< base/modules/02packages.details.txt.gz >.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2015 Shoichi Kaji <skaji@cpan.org>
+Copyright 2016 Shoichi Kaji <skaji@cpan.org>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -97,7 +97,7 @@ CPAN::Mirror::Tiny::Server - HTTP Server for CPAN::Mirror::Tiny
     --data-urlencode 'author=SONGMU' http://localhost:5000/upload
 
   # install by cpanm
-  $ cpanm --mirror=http://localhost:5000 Your::Module
+  $ cpanm --mirror http://localhost:5000 --mirror http://www.cpan.org Your::Module
 
   # install by carton install
   PERL_CARTON_MIRROR=http://localhost:5000 carton install

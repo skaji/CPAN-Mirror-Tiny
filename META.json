@@ -1,10 +1,10 @@
 {
-   "abstract" : "create partial CPAN mirror (aka DarkPAN)",
+   "abstract" : "create partial CPAN mirror (a.k.a. DarkPAN)",
    "author" : [
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
    "license" : [
       "perl_5"
    ],
@@ -32,6 +32,7 @@
       "develop" : {
          "requires" : {
             "Dist::Milla" : "v1.0.15",
+            "Test::More" : "0.98",
             "Test::Pod" : "1.41"
          }
       },
@@ -48,23 +49,18 @@
             "Parse::LocalDistribution" : "0",
             "perl" : "5.008001"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.98"
-         }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/shoichikaji/CPAN-Mirror-Tiny/issues"
+         "web" : "https://github.com/skaji/CPAN-Mirror-Tiny/issues"
       },
-      "homepage" : "https://github.com/shoichikaji/CPAN-Mirror-Tiny",
+      "homepage" : "https://github.com/skaji/CPAN-Mirror-Tiny",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shoichikaji/CPAN-Mirror-Tiny.git",
-         "web" : "https://github.com/shoichikaji/CPAN-Mirror-Tiny"
+         "url" : "https://github.com/skaji/CPAN-Mirror-Tiny.git",
+         "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
    "version" : "0.01",

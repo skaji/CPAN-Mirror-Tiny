@@ -9,14 +9,13 @@ __END__
 
 =head1 SYNOPSIS
 
-  $ cpan-mirror-server [base directory]
+  $ cpan-mirror-tiny-server [options] [base directory]
 
   Options are the same as plackup. Type `perldoc plackup` for the details.
-  ex: --port, --host, --server, --env, ...
+    ex: --port, --host, --server, --env, ...
 
   Examples:
-
-  # stat
+  # start
   $ cpan-mirror-server ./repository
   $ cpan-mirror-server --port 8080 --server Starman ./repository
 
@@ -25,7 +24,7 @@ __END__
     --data-urlencode 'author=SKAJI' http://localhost:5000/upload
 
   # install
-  $ cpanm --mirror=http://localhost:5000 Carl
+  $ cpanm --mirror http://localhost:5000 --mirror http://www.cpan.org Carl
 
 =cut
 
