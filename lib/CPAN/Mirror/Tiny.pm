@@ -165,7 +165,7 @@ sub index {
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
     my @line;
-    for my $p (sort { $a->{package} cmp $b->{package} } @collect) {
+    for my $p (sort { lc $a->{package} cmp lc $b->{package} } @collect) {
         push @line, sprintf "%-36s %-8s %s\n", $p->{package}, $p->{version}, $p->{path};
     }
     join '', @line;
