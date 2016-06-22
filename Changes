@@ -2,5 +2,8 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.02  2016-06-22 15:46:22 EDT
+  - packages should be sorted case insensitively in 02packages
+
 0.01  2016-02-12 01:06:45 JST
   - Initial release

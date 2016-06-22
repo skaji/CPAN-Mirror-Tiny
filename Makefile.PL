@@ -27,7 +27,7 @@ my %WriteMakefileArgs = (
     "HTTP::Tinyish" => 0,
     "Parse::LocalDistribution" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
