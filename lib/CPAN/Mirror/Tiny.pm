@@ -88,8 +88,13 @@ sub inject {
 
 sub inject_local {
     my ($self, $file, $option) = @_;
+    die "'$file' is not a file" unless -f $file;
+    die "'$file' must be tarball or zipball" if $file !~ /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
     my $author = ($option ||= {})->{author} || "VENDOR";
-    $self->_locate_tarball($file, $author);
+    my $tempdir = $self->tempdir;
+    my $copy = File::Spec->catfile($tempdir, File::Basename::basename($file));
+    File::Copy::copy($file, $copy) or die "Failed to copy $file: $!";
+    $self->_locate_tarball($copy, $author);
 }
 
 sub inject_http {
