@@ -5,6 +5,7 @@ requires 'Capture::Tiny';
 requires 'File::Which';
 requires 'File::pushd';
 requires 'HTTP::Tinyish';
+requires 'JSON';
 requires 'Parse::LocalDistribution';
 
 recommends 'Plack';

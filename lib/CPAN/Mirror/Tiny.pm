@@ -17,6 +17,8 @@ use File::Spec;
 use File::Temp ();
 use HTTP::Tinyish;
 use Parse::LocalDistribution;
+use Digest::MD5 ();
+use JSON ();
 
 sub new {
     my ($class, %option) = @_;
@@ -138,11 +140,42 @@ sub inject_git {
     }
 }
 
+my $JSON = JSON->new->canonical(1)->utf8(1);
+
+sub _cached {
+    my ($self, $path, $sub) = @_;
+    my $cache_dir = $self->base("modules", ".cache");
+    File::Path::mkpath($cache_dir) unless -d $cache_dir;
+    my $cache_file = File::Spec->catfile($cache_dir, Digest::MD5::md5_hex($path) . ".json");
+
+    my $mtime = (stat $path)[9];
+    if (-f $cache_file) {
+        my $content = do { open my $fh, "<", $cache_file or die; local $/; <$fh> };
+        my $cache = $JSON->decode($content);
+        if ($cache->{mtime} == $mtime) {
+            return $cache->{payload};
+        } else {
+            unlink $cache_file;
+        }
+    }
+    my $result = $sub->();
+    if ($result) {
+        open my $fh, ">", $cache_file or die;
+        my $content = {mtime => $mtime, path => $path, payload => $result};
+        print {$fh} $JSON->encode($content), "\n";
+        close $fh;
+    }
+    $result;
+}
+
 sub extract_provides {
     my ($self, $path) = @_;
-    unless (File::Spec->file_name_is_absolute($path)) {
-        $path = Cwd::abs_path($path);
-    }
+    $path = Cwd::abs_path($path);
+    $self->_cached($path, sub { $self->_extract_provides($path) });
+}
+
+sub _extract_provides {
+    my ($self, $path) = @_;
     my $gurad = $self->pushd_tempdir;
     my $dir = $self->extract($path) or return;
     my $parser = Parse::LocalDistribution->new({ALLOW_DEV_VERSION => 1});
