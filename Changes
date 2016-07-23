@@ -2,6 +2,10 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.04  2016-07-23 19:51:24 JST
+  - Now metadata for dists are cached; this makes creating index significantly fast
+  - Incompatible change: Now dists from git repositories contains version in their names
+
 0.03  2016-07-23 09:54:50 JST
   - $cpan->inject($local_tarball) accidentally used to remove $local_tarball; now fixed
 
