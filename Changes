@@ -2,6 +2,9 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.03  2016-07-23 09:54:50 JST
+  - $cpan->inject($local_tarball) accidentally used to remove $local_tarball; now fixed
+
 0.02  2016-06-22 15:46:22 EDT
   - packages should be sorted case insensitively in 02packages
 
