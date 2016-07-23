@@ -79,7 +79,7 @@ sub _system {
 sub inject {
     my ($self, $url, $option) = @_;
     if ($url =~ /(?:^git:|\.git(?:@(.+))?$)/) {
-        $self->inject_git($url, { %{$option || +{}}, $1 ? (ref => $1) :() });
+        $self->inject_git($url, $option);
     } elsif ($url =~ /^https?:/) {
         $self->inject_http($url, $option);
     } else {
@@ -118,7 +118,15 @@ sub inject_http {
 
 sub inject_git {
     my ($self, $url, $option) = @_;
+
     my $ref = ($option ||= {})->{ref};
+    if ($url =~ /(.*)\@(.*)$/) {
+        # take care of git@github.com:skaji/repo@tag, http://user:pass@example.com/foo@tag
+        my $remove = $2;
+        $ref ||= $remove;
+        $url =~ s/\@$remove$//;
+    }
+
     my $guard = $self->pushd_tempdir;
     my ($ok, $error) = $self->_system("git", "clone", $url, ".");
     die "Couldn't git clone $url: $error" unless $ok;
@@ -318,9 +326,9 @@ Inject C< $source > to our cpan mirror directory. C< $source > is one of
 
   $cpan->inject('http://example.com/Module.tar.gz', { author => "DUMMY" });
 
-=item * git url (with optional commitish)
+=item * git url (with optional ref)
 
-  $cpan->inject('git://github.com/skaji/Carl.git@0.114', { author => "SKAJI" });
+  $cpan->inject('git://github.com/skaji/Carl.git', { author => "SKAJI", ref => '0.114' });
 
 =back
 
@@ -363,8 +371,8 @@ Second way:
     Your::Module
 
 I hope that cpanm delegates the process of not only resolving modules
-but also fetching modules to L<CPAN::Common::Index>-like objects entirely,
-so that we can hack cpanm easily.
+but also fetching modules to L<CPAN::Common::Index>-like objects entirely.
+Then we can hack cpanm easily.
 
 I believe that cpanm 2.0 also known as L<Menlo> comes with such features!
 

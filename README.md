@@ -68,9 +68,9 @@ Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 
         $cpan->inject('http://example.com/Module.tar.gz', { author => "DUMMY" });
 
-- git url (with optional commitish)
+- git url (with optional ref)
 
-        $cpan->inject('git://github.com/skaji/Carl.git@0.114', { author => "SKAJI" });
+        $cpan->inject('git://github.com/skaji/Carl.git', { author => "SKAJI", ref => '0.114' });
 
 As seeing from the above examples, you can specify `author` in `\%option`.
 If you omit `author`, default `VENDOR` is used.
@@ -111,8 +111,8 @@ Second way:
       Your::Module
 
 I hope that cpanm delegates the process of not only resolving modules
-but also fetching modules to [CPAN::Common::Index](https://metacpan.org/pod/CPAN::Common::Index)-like objects entirely,
-so that we can hack cpanm easily.
+but also fetching modules to [CPAN::Common::Index](https://metacpan.org/pod/CPAN::Common::Index)-like objects entirely.
+Then we can hack cpanm easily.
 
 I believe that cpanm 2.0 also known as [Menlo](https://metacpan.org/pod/Menlo) comes with such features!
 
