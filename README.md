@@ -23,7 +23,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
 
-## WHY NEW?
+# WHY NEW?
 
 Yes, we already have great CPAN modules which create CPAN mirror.
 
@@ -38,9 +38,11 @@ Unfortunately existing CPAN mirror modules depend on XS modules.
 
 This is why I made CPAN::Mirror::Tiny.
 
-## METHODS
+# METHODS
 
-### `my $cpan = CPAN::Mirror::Tiny->new(%option)`
+## new
+
+    my $cpan = CPAN::Mirror::Tiny->new(%option)
 
 Constructor. ` %option ` may be:
 
@@ -52,7 +54,9 @@ Constructor. ` %option ` may be:
 
     Temp directory. Default `File::Temp::tempdir(CLEANUP => 1)`.
 
-### `$cpan->inject($source, \%option)`
+## inject
+
+    $cpan->inject($source, \%option)
 
 Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 
@@ -71,14 +75,46 @@ Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 As seeing from the above examples, you can specify `author` in `\%option`.
 If you omit `author`, default `VENDOR` is used.
 
-### `my $index_string = $cpan->index`
+## index
+
+    my $index_string = $cpan->index
 
 Get the index (a.k.a. 02packages.details.txt) of our cpan mirror.
 
-### `$cpan->write_index( compress => bool )`
+## write\_index
+
+    $cpan->write_index( compress => bool )
 
 Write the index to ` $base/modules/02packages.details.txt `
 or ` base/modules/02packages.details.txt.gz `.
+
+# TIPS
+
+## How can I install modules in my DarkPAN with cpanm?
+
+[cpanm](https://metacpan.org/pod/cpanm) is an awesome CPAN clients. If you want to install modules
+in your DarkPAN with cpanm, there are 2 ways.
+
+First way:
+
+    cpanm --cascade-search \
+      --mirror-index /path/to/darkpan/modules/02packages.details.txt \
+      --mirror /path/to/darkpan \
+      --mirror http://www.cpan.org \
+      Your::Module
+
+Second way:
+
+    cpanm --mirror-only \
+      --mirror /path/to/darkpan \
+      --mirror http://www.cpan.org \
+      Your::Module
+
+I hope that cpanm delegates the process of not only resolving modules
+but also fetching modules to [CPAN::Common::Index](https://metacpan.org/pod/CPAN::Common::Index)-like objects entirely,
+so that we can hack cpanm easily.
+
+I believe that cpanm 2.0 also known as [Menlo](https://metacpan.org/pod/Menlo) comes with such features!
 
 # COPYRIGHT AND LICENSE
 

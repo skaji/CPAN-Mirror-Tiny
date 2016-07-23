@@ -267,7 +267,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
 
-=head2 WHY NEW?
+=head1 WHY NEW?
 
 Yes, we already have great CPAN modules which create CPAN mirror.
 
@@ -282,9 +282,11 @@ Unfortunately existing CPAN mirror modules depend on XS modules.
 
 This is why I made CPAN::Mirror::Tiny.
 
-=head2 METHODS
+=head1 METHODS
 
-=head3 C<< my $cpan = CPAN::Mirror::Tiny->new(%option) >>
+=head2 new
+
+  my $cpan = CPAN::Mirror::Tiny->new(%option)
 
 Constructor. C< %option > may be:
 
@@ -300,7 +302,9 @@ Temp directory. Default C<< File::Temp::tempdir(CLEANUP => 1) >>.
 
 =back
 
-=head3 C<< $cpan->inject($source, \%option) >>
+=head2 inject
+
+  $cpan->inject($source, \%option)
 
 Inject C< $source > to our cpan mirror directory. C< $source > is one of
 
@@ -323,14 +327,46 @@ Inject C< $source > to our cpan mirror directory. C< $source > is one of
 As seeing from the above examples, you can specify C<author> in C<\%option>.
 If you omit C<author>, default C<VENDOR> is used.
 
-=head3 C<< my $index_string = $cpan->index >>
+=head2 index
+
+  my $index_string = $cpan->index
 
 Get the index (a.k.a. 02packages.details.txt) of our cpan mirror.
 
-=head3 C<< $cpan->write_index( compress => bool ) >>
+=head2 write_index
+
+  $cpan->write_index( compress => bool )
 
 Write the index to C< $base/modules/02packages.details.txt >
 or C< base/modules/02packages.details.txt.gz >.
+
+=head1 TIPS
+
+=head2 How can I install modules in my DarkPAN with cpanm?
+
+L<cpanm> is an awesome CPAN clients. If you want to install modules
+in your DarkPAN with cpanm, there are 2 ways.
+
+First way:
+
+  cpanm --cascade-search \
+    --mirror-index /path/to/darkpan/modules/02packages.details.txt \
+    --mirror /path/to/darkpan \
+    --mirror http://www.cpan.org \
+    Your::Module
+
+Second way:
+
+  cpanm --mirror-only \
+    --mirror /path/to/darkpan \
+    --mirror http://www.cpan.org \
+    Your::Module
+
+I hope that cpanm delegates the process of not only resolving modules
+but also fetching modules to L<CPAN::Common::Index>-like objects entirely,
+so that we can hack cpanm easily.
+
+I believe that cpanm 2.0 also known as L<Menlo> comes with such features!
 
 =head1 COPYRIGHT AND LICENSE
 
