@@ -130,7 +130,7 @@ sub inject_git {
     die "Couldn't find $metafile in $url" unless -f $metafile;
     my $meta = CPAN::Meta->load_file($metafile);
     chomp(my $rev = `git rev-parse --short HEAD`);
-    my $distvname = sprintf "%s-%s", $meta->name, $rev;
+    my $distvname = sprintf "%s-%s-%s", $meta->name, $meta->version, $rev;
     ($ok, $error) = $self->_system(
         "git archive --format=tar --prefix=$distvname/ HEAD | gzip > $distvname.tar.gz"
     );
