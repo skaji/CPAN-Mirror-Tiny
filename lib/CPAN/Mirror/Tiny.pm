@@ -109,7 +109,8 @@ sub inject_http {
     my $file = "$tempdir/$basename";
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
-        return $self->inject_local($file, $option);
+        my $author = ($option ||= {})->{author} || "VENDOR";
+        return $self->_locate_tarball($file, $author);
     } else {
         die "Couldn't get $url: $res->{status} $res->{reason}";
     }
