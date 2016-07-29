@@ -14,6 +14,7 @@ use File::Basename ();
 use File::Copy ();
 use File::Path ();
 use File::Spec;
+use File::Spec::Unix;
 use File::Temp ();
 use HTTP::Tinyish;
 use Parse::LocalDistribution;
@@ -203,7 +204,7 @@ sub index {
         my $path = $_;
         my $mtime = (stat $path)[9];
         my $provides = $self->extract_provides($path);
-        my $relative = File::Spec->abs2rel($path, $base);
+        my $relative = File::Spec::Unix->abs2rel($path, $base);
         $self->_update_packages(\%packages, $provides, $relative, $mtime);
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
