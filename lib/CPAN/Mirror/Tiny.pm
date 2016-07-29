@@ -306,7 +306,7 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
   # $ find repository -type f
   # repository/authors/id/V/VE/VENDOR/App-cpm-0.112.tar.gz
-  # repository/authors/id/V/VE/VENDOR/Carl-ff194fe.tar.gz
+  # repository/authors/id/V/VE/VENDOR/Carl-0.01-ff194fe.tar.gz
   # repository/modules/02packages.details.txt.gz
 
 =head1 DESCRIPTION
