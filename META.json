@@ -48,6 +48,7 @@
             "HTTP::Tinyish" : "0",
             "JSON" : "0",
             "Parse::LocalDistribution" : "0",
+            "Parse::PMFile" : "0",
             "perl" : "5.008001"
          }
       }

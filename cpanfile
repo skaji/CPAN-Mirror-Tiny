@@ -7,6 +7,7 @@ requires 'File::pushd';
 requires 'HTTP::Tinyish';
 requires 'JSON';
 requires 'Parse::LocalDistribution';
+requires 'Parse::PMFile';
 
 recommends 'Plack';
 
