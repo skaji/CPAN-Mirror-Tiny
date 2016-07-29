@@ -17,6 +17,7 @@ use File::Spec;
 use File::Temp ();
 use HTTP::Tinyish;
 use Parse::LocalDistribution;
+use Parse::PMFile;
 use Digest::MD5 ();
 use JSON ();
 
@@ -161,7 +162,7 @@ sub _cached {
     if (-f $cache_file) {
         my $content = do { open my $fh, "<", $cache_file or die; local $/; <$fh> };
         my $cache = $JSON->decode($content);
-        if ($cache->{mtime} == $mtime) {
+        if ($cache->{mtime} == $mtime and (ref $cache->{payload} eq 'HASH')) {
             return $cache->{payload};
         } else {
             unlink $cache_file;
@@ -188,32 +189,31 @@ sub _extract_provides {
     my $gurad = $self->pushd_tempdir;
     my $dir = $self->extract($path) or return;
     my $parser = Parse::LocalDistribution->new({ALLOW_DEV_VERSION => 1});
-    my $hash = $parser->parse($dir) || +{};
-    [map +{ package => $_, version => $hash->{$_}{version} }, sort keys %$hash];
+    $parser->parse($dir) || +{};
 }
 
-# TODO cache
 sub index {
     my $self = shift;
     my $base = $self->base("authors/id");
     return unless -d $base;
-    my @collect;
+    my %packages;
     my $wanted = sub {
+        return unless -f;
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
+        my $mtime = (stat $path)[9];
         my $provides = $self->extract_provides($path);
-        for my $provide (@$provides) {
-            push @collect, {
-                path => File::Spec->abs2rel($path, $base),
-                package => $provide->{package},
-                version => $provide->{version},
-            };
-        }
+        my $relative = File::Spec->abs2rel($path, $base);
+        $self->_update_packages(\%packages, $provides, $relative, $mtime);
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
+
     my @line;
-    for my $p (sort { lc $a->{package} cmp lc $b->{package} } @collect) {
-        push @line, sprintf "%-36s %-8s %s\n", $p->{package}, $p->{version}, $p->{path};
+    for my $package (sort { lc $a cmp lc $b } keys %packages) {
+        my $path    = $packages{$package}[1];
+        my $version = $packages{$package}[0];
+        $version = 'undef' unless defined $version;
+        push @line, sprintf "%-36s %-8s %s\n", $package, $version, $path;
     }
     join '', @line;
 }
@@ -244,6 +244,43 @@ sub write_index {
     }
 }
 
+# Copy from WorePAN: https://github.com/charsbar/worepan/blob/master/lib/WorePAN.pm
+# Copyright (C) 2012 by Kenichi Ishigaki.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+sub _update_packages {
+  my ($self, $packages, $info, $path, $mtime) = @_;
+
+  for my $module (sort keys %$info) {
+    next unless exists $info->{$module}{version};
+    my $new_version = $info->{$module}{version};
+    if (!$packages->{$module}) { # shortcut
+      $packages->{$module} = [$new_version, $path, $mtime];
+      next;
+    }
+    my $ok = 0;
+    my $cur_version = $packages->{$module}[0];
+    if (Parse::PMFile->_vgt($new_version, $cur_version)) {
+      $ok++;
+    }
+    elsif (Parse::PMFile->_vgt($cur_version, $new_version)) {
+      # lower VERSION number
+    }
+    else {
+      if (
+        $new_version eq 'undef' or $new_version == 0 or
+        Parse::PMFile->_vcmp($new_version, $cur_version) == 0
+      ) {
+        if ($mtime >= $packages->{$module}[2]) {
+          $ok++; # dist is newer
+        }
+      }
+    }
+    if ($ok) {
+      $packages->{$module} = [$new_version, $path, $mtime];
+    }
+  }
+}
 
 1;
 __END__

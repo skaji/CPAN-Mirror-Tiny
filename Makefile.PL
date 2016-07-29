@@ -26,7 +26,8 @@ my %WriteMakefileArgs = (
     "File::pushd" => 0,
     "HTTP::Tinyish" => 0,
     "JSON" => 0,
-    "Parse::LocalDistribution" => 0
+    "Parse::LocalDistribution" => 0,
+    "Parse::PMFile" => 0
   },
   "VERSION" => "0.04",
   "test" => {
@@ -42,7 +43,8 @@ my %FallbackPrereqs = (
   "File::pushd" => 0,
   "HTTP::Tinyish" => 0,
   "JSON" => 0,
-  "Parse::LocalDistribution" => 0
+  "Parse::LocalDistribution" => 0,
+  "Parse::PMFile" => 0
 );
 
 
