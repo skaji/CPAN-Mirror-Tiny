@@ -2,6 +2,9 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.05  2016-07-30 00:26:24 JST
+  - Fix indexing issue; copy _update_packages from WorePAN (#3 by maxhq, #4)
+
 0.04  2016-07-23 19:51:24 JST
   - Now metadata for dists are cached; this makes creating index significantly fast
   - Incompatible change: Now dists from git repositories contains version in their names
