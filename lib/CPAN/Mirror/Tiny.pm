@@ -124,9 +124,12 @@ sub inject_git {
     my $ref = ($option ||= {})->{ref};
     if ($url =~ /(.*)\@(.*)$/) {
         # take care of git@github.com:skaji/repo@tag, http://user:pass@example.com/foo@tag
-        my $remove = $2;
-        $ref ||= $remove;
-        $url =~ s/\@$remove$//;
+        my ($leading, $remove) = ($1, $2);
+        my ($ok, $error) = $self->_system("git", "ls-remote", $leading);
+        if ($ok) {
+            $ref = $remove;
+            $url =~ s/\@$remove$//;
+        }
     }
 
     my $guard = $self->pushd_tempdir;
