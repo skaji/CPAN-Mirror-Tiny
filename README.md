@@ -75,7 +75,7 @@ Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 As seeing from the above examples, you can specify `author` in `\%option`.
 If you omit `author`, default `VENDOR` is used.
 
-**CAUTION**: Currently, the distribution name for git repository is somthing like
+**CAUTION**: Currently, the distribution name for git repository is something like
 `S/SK/SKAJI/Carl-0.01-9188c0e.tar.gz`,
 where `0.01` is the version and `9188c0e` is `git rev-parse --short HEAD`.
 However this naming convention is likely to change. Do not depend on this!
