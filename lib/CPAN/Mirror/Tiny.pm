@@ -376,7 +376,7 @@ Inject C< $source > to our cpan mirror directory. C< $source > is one of
 As seeing from the above examples, you can specify C<author> in C<\%option>.
 If you omit C<author>, default C<VENDOR> is used.
 
-B<CAUTION>: Currently, the distribution name for git repository is somthing like
+B<CAUTION>: Currently, the distribution name for git repository is something like
 C<S/SK/SKAJI/Carl-0.01-9188c0e.tar.gz>,
 where C<0.01> is the version and C<9188c0e> is C<git rev-parse --short HEAD>.
 However this naming convention is likely to change. Do not depend on this!
