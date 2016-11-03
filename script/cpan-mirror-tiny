@@ -31,7 +31,7 @@ You can easily create your darkpan with this script.
 
 =head2 TYPICAL USAGE
 
-Let's create your darkpna in C<./dakpan> directory.
+Let's create your darkpan in C<./darkpan> directory.
 
 First inject distributions into your darkpan with C<inject> command:
 
