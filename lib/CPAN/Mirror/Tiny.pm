@@ -12,6 +12,7 @@ use Capture::Tiny ();
 use Cwd ();
 use File::Basename ();
 use File::Copy ();
+use File::Copy::Recursive ();
 use File::Path ();
 use File::Spec;
 use File::Spec::Unix;
@@ -80,25 +81,79 @@ sub _system {
 
 sub inject {
     my ($self, $url, $option) = @_;
-    if ($url =~ /(?:^git:|\.git(?:@(.+))?$)/) {
+
+    my $maybe_git = sub {
+        my $url = shift;
+        scalar($url =~ m{\A https?:// (?:github\.com|bitbucket.org) / [^/]+ / [^/]+ \z}x);
+    };
+
+    if ($url =~ s{^file://}{} or -e $url) {
+        $self->inject_local($url, $option);
+    } elsif ($url =~ /(?:^git|\.git(?:@(.+))?$)/ or $maybe_git->($url)) {
         $self->inject_git($url, $option);
-    } elsif ($url =~ /^https?:/) {
+    } elsif ($url =~ /^https?:/ or $url =~ /^cpan:/) {
+        if ($url =~ /^cpan:(.+?)(?:@(.+))?$/) {
+            my $resolved_url = $self->_cpan_url($1, $2);
+            die "Failed to resolve $url\n" unless $resolved_url;
+            $url = $resolved_url;
+        }
         $self->inject_http($url, $option);
     } else {
-        $url =~ s{^file://}{};
-        $self->inject_local($url, $option);
+        die "Unknown url $url\n";
     }
 }
 
+sub _encode {
+    my $str = shift;
+    $str =~ s/([^a-zA-Z0-9_\-.])/uc sprintf("%%%02x",ord($1))/eg;
+    $str;
+}
+
+sub _cpan_url {
+    my ($self, $module, $version) = @_;
+    my $url = "https://fastapi.metacpan.org/v1/download_url/$module";
+    $url .= "?version=" . _encode("== $version") if $version;
+    my $res = $self->http->get($url);
+    die "$res->{status} $res->{reason} $url\n" unless $res->{success};
+    my $hash = eval { JSON::PP::decode_json($res->{content}) } || +{};
+    $hash->{download_url};
+}
+
 sub inject_local {
+    my ($self, $arg) = (shift, shift);
+    if (-f $arg) {
+        return $self->inject_local_file($arg, @_);
+    } elsif (-d $arg) {
+        return $self->inject_local_directory($arg, @_);
+    } else {
+        die "$arg is neither file nor directory";
+    }
+}
+
+sub inject_local_file {
     my ($self, $file, $option) = @_;
     die "'$file' is not a file" unless -f $file;
     die "'$file' must be tarball or zipball" if $file !~ /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
+    $file = Cwd::abs_path($file);
+    my $guard = $self->pushd_tempdir;
+    my $dir = $self->extract($file);
+    return $self->inject_local_directory($dir, $option);
+}
+
+sub inject_local_directory {
+    my ($self, $dir, $option) = @_;
+    my $metafile = File::Spec->catfile($dir, "META.json");
+    die "Missing META.json in $dir" unless -f $metafile;
+    my $meta = CPAN::Meta->load_file($metafile);
+    my $distvname = sprintf "%s-%s", $meta->name, $meta->version;
+    $dir = Cwd::abs_path($dir);
+    my $guard = $self->pushd_tempdir;
+    File::Path::rmtree($distvname) if -d $distvname;
+    File::Copy::Recursive::dircopy($dir, $distvname) or die;
+    my ($ok, $err) = $self->_system("tar", "czf", "$distvname.tar.gz", $distvname);
+    die "Failed to create tarball: $err" unless $ok;
     my $author = ($option ||= {})->{author} || "VENDOR";
-    my $tempdir = $self->tempdir;
-    my $copy = File::Spec->catfile($tempdir, File::Basename::basename($file));
-    File::Copy::copy($file, $copy) or die "Failed to copy $file: $!";
-    $self->_locate_tarball($copy, $author);
+    return $self->_locate_tarball("$distvname.tar.gz", $author);
 }
 
 sub inject_http {
@@ -111,8 +166,16 @@ sub inject_http {
     my $file = "$tempdir/$basename";
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
-        my $author = ($option ||= {})->{author} || "VENDOR";
-        return $self->_locate_tarball($file, $author);
+        my $author = ($option ||= {})->{author};
+        if (!$author) {
+            if ($url =~ m{/authors/id/./../([^/]+)/}) {
+                $author = $1;
+                return $self->_locate_tarball($file, $author);
+            } else {
+                $author = "VENDOR";
+            }
+        }
+        return $self->inject_local_file($file, {author => $author});
     } else {
         die "Couldn't get $url: $res->{status} $res->{reason}";
     }
@@ -148,25 +211,30 @@ sub inject_git {
         "git archive --format=tar --prefix=$distvname/ HEAD | gzip > $distvname.tar.gz"
     );
     if ($ok && -f "$distvname.tar.gz") {
-        return $self->inject_local("$distvname.tar.gz", $option);
+        my $author = ($option || +{})->{author} || "VENDOR";
+        return $self->_locate_tarball("$distvname.tar.gz", $author);
     } else {
         die "Couldn't archive $url: $error";
     }
 }
 
 my $JSON = JSON->new->canonical(1)->utf8(1);
+my $CACHE_VERSION = 1;
 
 sub _cached {
     my ($self, $path, $sub) = @_;
+    return unless -f $path;
     my $cache_dir = $self->base("modules", ".cache");
     File::Path::mkpath($cache_dir) unless -d $cache_dir;
-    my $cache_file = File::Spec->catfile($cache_dir, Digest::MD5::md5_hex($path) . ".json");
 
-    my $mtime = (stat $path)[9];
+    my $md5 = Digest::MD5->new;
+    $md5->addfile(do { open my $fh, "<", $path or die; $fh });
+    my $cache_file = File::Spec->catfile($cache_dir, $md5->hexdigest . ".json");
+
     if (-f $cache_file) {
         my $content = do { open my $fh, "<", $cache_file or die; local $/; <$fh> };
         my $cache = $JSON->decode($content);
-        if ($cache->{mtime} == $mtime and (ref $cache->{payload} eq 'HASH')) {
+        if ( ($cache->{version} || 0) == $CACHE_VERSION ) {
             return $cache->{payload};
         } else {
             unlink $cache_file;
@@ -175,7 +243,7 @@ sub _cached {
     my $result = $sub->();
     if ($result) {
         open my $fh, ">", $cache_file or die;
-        my $content = {mtime => $mtime, path => $path, payload => $result};
+        my $content = {version => $CACHE_VERSION, payload => $result};
         print {$fh} $JSON->encode($content), "\n";
         close $fh;
     }
@@ -301,20 +369,21 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
   use CPAN::Mirror::Tiny;
 
-  my $cpan = CPAN::Mirror::Tiny->new(base => "./repository");
+  my $cpan = CPAN::Mirror::Tiny->new(base => "./darkpan");
 
   $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
   $cpan->inject("https://github.com/skaji/Carl.git");
   $cpan->write_index(compress => 1);
 
-  # $ find repository -type f
-  # repository/authors/id/V/VE/VENDOR/App-cpm-0.112.tar.gz
-  # repository/authors/id/V/VE/VENDOR/Carl-0.01-ff194fe.tar.gz
-  # repository/modules/02packages.details.txt.gz
+  # $ find darkpan -type f
+  # darkpan/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz
+  # darkpan/authors/id/V/VE/VENDOR/Carl-0.01-ff194fe.tar.gz
+  # darkpan/modules/02packages.details.txt.gz
 
 =head1 DESCRIPTION
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
+There is a command line interface for CPAN::Mirror::Tiny L<cpan-mirror-tiny>.
 
 =head1 WHY NEW?
 
@@ -359,9 +428,10 @@ Inject C< $source > to our cpan mirror directory. C< $source > is one of
 
 =over 4
 
-=item * local tar.gz path
+=item * local tar.gz path / directory
 
   $cpan->inject('/path/to/Module.tar.gz', { author => "SKAJI" });
+  $cpan->inject('/path/to/dir',           { author => "SKAJI" });
 
 =item * http url of tar.gz
 
@@ -379,7 +449,6 @@ If you omit C<author>, default C<VENDOR> is used.
 B<CAUTION>: Currently, the distribution name for git repository is something like
 C<S/SK/SKAJI/Carl-0.01-9188c0e.tar.gz>,
 where C<0.01> is the version and C<9188c0e> is C<git rev-parse --short HEAD>.
-However this naming convention is likely to change. Do not depend on this!
 
 =head2 index
 
@@ -396,7 +465,7 @@ or C< base/modules/02packages.details.txt.gz >.
 
 =head1 TIPS
 
-=head2 How can I install modules in my DarkPAN with cpanm?
+=head2 How can I install modules in my DarkPAN with cpanm / cpm?
 
 L<cpanm> is an awesome CPAN clients. If you want to install modules
 in your DarkPAN with cpanm, there are 2 ways.
@@ -416,11 +485,9 @@ Second way:
     --mirror http://www.cpan.org \
     Your::Module
 
-I hope that cpanm delegates the process of not only resolving modules
-but also fetching modules to L<CPAN::Common::Index>-like objects entirely.
-Then we can hack cpanm easily.
+If you use L<cpm>, then:
 
-I believe that cpanm 2.0 also known as L<Menlo> comes with such features!
+  cpm install -r 02packages,file:///path/to/drakpan -r metadb Your::Module
 
 =head1 COPYRIGHT AND LICENSE
 

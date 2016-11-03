@@ -8,20 +8,21 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 
     use CPAN::Mirror::Tiny;
 
-    my $cpan = CPAN::Mirror::Tiny->new(base => "./repository");
+    my $cpan = CPAN::Mirror::Tiny->new(base => "./darkpan");
 
     $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz");
     $cpan->inject("https://github.com/skaji/Carl.git");
     $cpan->write_index(compress => 1);
 
-    # $ find repository -type f
-    # repository/authors/id/V/VE/VENDOR/App-cpm-0.112.tar.gz
-    # repository/authors/id/V/VE/VENDOR/Carl-0.01-ff194fe.tar.gz
-    # repository/modules/02packages.details.txt.gz
+    # $ find darkpan -type f
+    # darkpan/authors/id/S/SK/SKAJI/App-cpm-0.112.tar.gz
+    # darkpan/authors/id/V/VE/VENDOR/Carl-0.01-ff194fe.tar.gz
+    # darkpan/modules/02packages.details.txt.gz
 
 # DESCRIPTION
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
+There is a command line interface for CPAN::Mirror::Tiny [cpan-mirror-tiny](https://metacpan.org/pod/cpan-mirror-tiny).
 
 # WHY NEW?
 
@@ -60,9 +61,10 @@ Constructor. ` %option ` may be:
 
 Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 
-- local tar.gz path
+- local tar.gz path / directory
 
         $cpan->inject('/path/to/Module.tar.gz', { author => "SKAJI" });
+        $cpan->inject('/path/to/dir',           { author => "SKAJI" });
 
 - http url of tar.gz
 
@@ -78,7 +80,6 @@ If you omit `author`, default `VENDOR` is used.
 **CAUTION**: Currently, the distribution name for git repository is something like
 `S/SK/SKAJI/Carl-0.01-9188c0e.tar.gz`,
 where `0.01` is the version and `9188c0e` is `git rev-parse --short HEAD`.
-However this naming convention is likely to change. Do not depend on this!
 
 ## index
 
@@ -95,7 +96,7 @@ or ` base/modules/02packages.details.txt.gz `.
 
 # TIPS
 
-## How can I install modules in my DarkPAN with cpanm?
+## How can I install modules in my DarkPAN with cpanm / cpm?
 
 [cpanm](https://metacpan.org/pod/cpanm) is an awesome CPAN clients. If you want to install modules
 in your DarkPAN with cpanm, there are 2 ways.
@@ -115,11 +116,9 @@ Second way:
       --mirror http://www.cpan.org \
       Your::Module
 
-I hope that cpanm delegates the process of not only resolving modules
-but also fetching modules to [CPAN::Common::Index](https://metacpan.org/pod/CPAN::Common::Index)-like objects entirely.
-Then we can hack cpanm easily.
+If you use [cpm](https://metacpan.org/pod/cpm), then:
 
-I believe that cpanm 2.0 also known as [Menlo](https://metacpan.org/pod/Menlo) comes with such features!
+    cpm install -r 02packages,file:///path/to/drakpan -r metadb Your::Module
 
 # COPYRIGHT AND LICENSE
 

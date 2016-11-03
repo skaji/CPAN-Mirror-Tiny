@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -43,6 +43,7 @@
          "requires" : {
             "CPAN::Meta" : "0",
             "Capture::Tiny" : "0",
+            "File::Copy::Recursive" : "0",
             "File::Which" : "0",
             "File::pushd" : "0",
             "HTTP::Tinyish" : "0",
@@ -66,7 +67,7 @@
       }
    },
    "version" : "0.05",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222",
    "x_static_install" : "1"
 }
 

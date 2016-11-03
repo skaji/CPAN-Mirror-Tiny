@@ -10,8 +10,8 @@ my $cpan = CPAN::Mirror::Tiny->new(base => $base);
 $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Distribution-Metadata-0.03.tar.gz");
 $cpan->inject("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Distribution-Metadata-0.04.tar.gz");
 
-my $dist3 = "$base/authors/id/V/VE/VENDOR/Distribution-Metadata-0.03.tar.gz";
-my $dist4 = "$base/authors/id/V/VE/VENDOR/Distribution-Metadata-0.04.tar.gz";
+my $dist3 = "$base/authors/id/S/SK/SKAJI/Distribution-Metadata-0.03.tar.gz";
+my $dist4 = "$base/authors/id/S/SK/SKAJI/Distribution-Metadata-0.04.tar.gz";
 my $now = time;
 
 subtest test1 => sub {

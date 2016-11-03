@@ -3,28 +3,22 @@ use strict;
 use warnings;
 use CPAN::Mirror::Tiny::Server;
 
+warn "WARN: This script is deprecated, use `cpan-mirror-tiny server` instead.\n";
 CPAN::Mirror::Tiny::Server->start(@ARGV);
 
 __END__
 
+=head1 NAME
+
+cpan-mirror-tiny-server - run http server for your darkpan
+
 =head1 SYNOPSIS
 
-  $ cpan-mirror-tiny-server [options] [base directory]
+  $ cpan-mirror-tiny-server
 
-  Options are the same as plackup. Type `perldoc plackup` for the details.
-    ex: --port, --host, --server, --env, ...
+=head1 DESCRIPTION
 
-  Examples:
-  # start
-  $ cpan-mirror-server ./repository
-  $ cpan-mirror-server --port 8080 --server Starman ./repository
-
-  # upload
-  $ curl --data-urlencode 'module=git://github.com/skaji/Carl.git' \
-    --data-urlencode 'author=SKAJI' http://localhost:5000/upload
-
-  # install
-  $ cpanm --mirror http://localhost:5000 --mirror http://www.cpan.org Carl
+This script is deprecated, use C<cpan-mirror-tiny server> instead.
 
 =cut
 

@@ -2,6 +2,7 @@ requires 'perl', '5.008001';
 
 requires 'CPAN::Meta';
 requires 'Capture::Tiny';
+requires 'File::Copy::Recursive';
 requires 'File::Which';
 requires 'File::pushd';
 requires 'HTTP::Tinyish';
