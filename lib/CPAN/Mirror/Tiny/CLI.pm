@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use CPAN::Mirror::Tiny;
 use File::Find ();
+use File::Spec;
 use Getopt::Long ();
 use HTTP::Tinyish;
 use JSON::PP ();

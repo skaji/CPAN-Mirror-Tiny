@@ -22,7 +22,8 @@ CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
 # DESCRIPTION
 
 CPAN::Mirror::Tiny helps you create partial CPAN mirror (also known as DarkPAN).
-There is a command line interface for CPAN::Mirror::Tiny [cpan-mirror-tiny](https://metacpan.org/pod/cpan-mirror-tiny).
+
+There is also a command line interface [cpan-mirror-tiny](https://metacpan.org/pod/cpan-mirror-tiny) for CPAN::Mirror::Tiny.
 
 # WHY NEW?
 
