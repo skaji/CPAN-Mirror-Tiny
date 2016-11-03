@@ -2,6 +2,9 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.10  2016-11-04 01:56:27 JST
+  - Add command line interface cpan-mirror-tiny
+
 0.05  2016-07-30 00:26:24 JST
   - Fix indexing issue; copy _update_packages from WorePAN (#3 by maxhq, #4)
 

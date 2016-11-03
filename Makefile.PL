@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
     "Parse::LocalDistribution" => 0,
     "Parse::PMFile" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.10",
   "test" => {
     "TESTS" => "t/*.t"
   }
