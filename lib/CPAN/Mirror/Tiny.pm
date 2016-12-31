@@ -23,6 +23,9 @@ use Parse::PMFile;
 use Digest::MD5 ();
 use JSON ();
 
+my $JSON = JSON->new->canonical(1)->utf8(1);
+my $CACHE_VERSION = 1;
+
 sub new {
     my ($class, %option) = @_;
     my $base = $option{base} || $ENV{PERL_CPAN_MIRROR_TINY_BASE} or die "Missing base directory argument";
@@ -112,7 +115,7 @@ sub _cpan_url {
     $url .= "?version=" . _encode("== $version") if $version;
     my $res = $self->http->get($url);
     return (undef, "$res->{status} $res->{reason}, $url") unless $res->{success};
-    my $hash = eval { JSON::PP::decode_json($res->{content}) };
+    my $hash = eval { $JSON->decode($res->{content}) };
     if ($@) {
         return (undef, $@);
     } else {
@@ -230,9 +233,6 @@ sub inject_git {
         die "Couldn't archive $url: $error";
     }
 }
-
-my $JSON = JSON->new->canonical(1)->utf8(1);
-my $CACHE_VERSION = 1;
 
 sub _cached {
     my ($self, $path, $sub) = @_;

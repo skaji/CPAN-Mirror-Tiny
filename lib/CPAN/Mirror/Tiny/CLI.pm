@@ -6,7 +6,6 @@ use File::Find ();
 use File::Spec;
 use Getopt::Long ();
 use HTTP::Tinyish;
-use JSON::PP ();
 use POSIX ();
 use Pod::Usage 1.33 ();
 
