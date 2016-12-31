@@ -93,9 +93,9 @@ Moreover you can inject/upload your modules against C<http://host1:5000/upload>:
   [host2]$ curl --data-urlencode 'module=git://github.com/skaji/Carl.git' \
                 --data-urlencode 'author=SKAJI' http://host1:5000/upload
 
-=item upload tarballs with L<cpan-upload>
+=item upload tarballs with L<cpan-upload|https://metacpan.org/pod/distribution/CPAN-Uploader/bin/cpan-upload>
 
-  [host2]$ export CPAN_UPLOADER_UPLOAD_URI=http://host2:5000/upload
+  [host2]$ export CPAN_UPLOADER_UPLOAD_URI=http://host1:5000/upload
   [host2]$ cpan-upload --user SKAJI --password dummy /path/to/local/Module-0.01.tar.gz
 
 =back
