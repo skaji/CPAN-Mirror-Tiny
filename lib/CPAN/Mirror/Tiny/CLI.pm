@@ -98,7 +98,7 @@ sub cmd_cat_index {
     my ($self, @argv) = @_;
     my $index = File::Spec->catfile($self->{base}, "modules", "02packages.details.txt.gz");
     return unless -f $index;
-    return !system "gunzip", "--stdout", $index;
+    return !system "gzip", "--decompress", "--stdout", $index;
 }
 
 sub cmd_list {
