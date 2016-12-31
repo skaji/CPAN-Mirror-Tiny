@@ -2,6 +2,10 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.11  2016-12-31 16:47:17 JST
+  - Add inject_cpan method
+  - Improve document
+
 0.10  2016-11-04 01:56:27 JST
   - Add command line interface cpan-mirror-tiny
 

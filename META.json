@@ -67,7 +67,7 @@
          "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225",
    "x_static_install" : "1"
 }
