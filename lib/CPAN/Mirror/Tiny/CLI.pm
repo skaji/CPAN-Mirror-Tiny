@@ -8,12 +8,12 @@ use Getopt::Long ();
 use HTTP::Tinyish;
 use JSON::PP ();
 use POSIX ();
-use Pod::Usage ();
+use Pod::Usage 1.33 ();
 
 sub new {
     my $class = shift;
     bless {
-        base => "darkpan",
+        base => $ENV{PERL_CPAN_MIRROR_TINY_BASE} || "darkpan",
         http => HTTP::Tinyish->new(agent => "CPAN::Mirror::Tiny/$CPAN::Mirror::Tiny::VERSION"),
     }, $class;
 }
@@ -60,7 +60,7 @@ sub parse_options {
 }
 
 sub cmd_help {
-    Pod::Usage::pod2usage(0);
+    Pod::Usage::pod2usage(verbose => 99, sections => 'SYNOPSIS|OPTIONS|EXAMPLES');
     return 1;
 }
 

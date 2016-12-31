@@ -50,7 +50,8 @@ Constructor. ` %option ` may be:
 
 - base
 
-    Base directory for cpan mirror. This is required.
+    Base directory for cpan mirror. If `$ENV{PERL_CPAN_MIRROR_TINY_BASE}` is set, it will be used.
+    This is required.
 
 - tempdir
 
@@ -58,7 +59,19 @@ Constructor. ` %option ` may be:
 
 ## inject
 
+    # automatically guess $source
     $cpan->inject($source, \%option)
+
+    # or explicitly call inject_* method
+    $cpan->inject_local('/path/to//Your-Module-0.01.tar.gz'', {author => 'YOU'});
+    $cpan->inject_local_file('/path/to//Your-Module-0.01.tar.gz'', {author => 'YOU'});
+    $cpan->inject_local_directory('/path/to/cpan/dir', {author => 'YOU'});
+
+    $cpan->inject_http('http://example.com/Hoge-0.01.tar.gz', {author => 'YOU'});
+
+    $cpan->inject_git('git://github.com/skaji/Carl.git', {author => 'SKAJI'});
+
+    $cpan->inject_cpan('Plack', {version => '1.0039'});
 
 Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 
@@ -74,6 +87,10 @@ Inject ` $source ` to our cpan mirror directory. ` $source ` is one of
 - git url (with optional ref)
 
         $cpan->inject('git://github.com/skaji/Carl.git', { author => "SKAJI", ref => '0.114' });
+
+- cpan module
+
+        $cpan->inject('cpan:Plack', {version => '1.0039'});
 
 As seeing from the above examples, you can specify `author` in `\%option`.
 If you omit `author`, default `VENDOR` is used.

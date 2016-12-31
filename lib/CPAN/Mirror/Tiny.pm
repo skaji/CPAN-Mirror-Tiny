@@ -25,7 +25,7 @@ use JSON ();
 
 sub new {
     my ($class, %option) = @_;
-    my $base  = $option{base} or die "Missing base directory argument";
+    my $base = $option{base} || $ENV{PERL_CPAN_MIRROR_TINY_BASE} or die "Missing base directory argument";
     my $tempdir = $option{tempdir} || File::Temp::tempdir(CLEANUP => 1);
     File::Path::mkpath($base) unless -d $base;
     $base = Cwd::abs_path($base);
@@ -91,12 +91,9 @@ sub inject {
         $self->inject_local($url, $option);
     } elsif ($url =~ /(?:^git|\.git(?:@(.+))?$)/ or $maybe_git->($url)) {
         $self->inject_git($url, $option);
-    } elsif ($url =~ /^https?:/ or $url =~ /^cpan:/) {
-        if ($url =~ /^cpan:(.+?)(?:@(.+))?$/) {
-            my $resolved_url = $self->_cpan_url($1, $2);
-            die "Failed to resolve $url\n" unless $resolved_url;
-            $url = $resolved_url;
-        }
+    } elsif ($url =~ /^cpan:(.+)/) {
+        $self->inject_cpan($1, $option);
+    } elsif ($url =~ /^https?:/) {
         $self->inject_http($url, $option);
     } else {
         die "Unknown url $url\n";
@@ -114,9 +111,13 @@ sub _cpan_url {
     my $url = "https://fastapi.metacpan.org/v1/download_url/$module";
     $url .= "?version=" . _encode("== $version") if $version;
     my $res = $self->http->get($url);
-    die "$res->{status} $res->{reason} $url\n" unless $res->{success};
-    my $hash = eval { JSON::PP::decode_json($res->{content}) } || +{};
-    $hash->{download_url};
+    return (undef, "$res->{status} $res->{reason}, $url") unless $res->{success};
+    my $hash = eval { JSON::PP::decode_json($res->{content}) };
+    if ($@) {
+        return (undef, $@);
+    } else {
+        return ($hash->{download_url}, undef);
+    }
 }
 
 sub inject_local {
@@ -179,6 +180,18 @@ sub inject_http {
     } else {
         die "Couldn't get $url: $res->{status} $res->{reason}";
     }
+}
+
+sub inject_cpan {
+    my ($self, $package, $option) = @_;
+    $package =~ s/^cpan://;
+    my $version = $option->{version};
+    if ($package =~ s/@(.+)$//) {
+        $version ||= $1;
+    }
+    my ($url, $err) = $self->_cpan_url($package, $version);
+    die $err if $err;
+    $self->inject_http($url, $option);
 }
 
 sub inject_git {
@@ -413,7 +426,8 @@ Constructor. C< %option > may be:
 
 =item * base
 
-Base directory for cpan mirror. This is required.
+Base directory for cpan mirror. If C<$ENV{PERL_CPAN_MIRROR_TINY_BASE}> is set, it will be used.
+This is required.
 
 =item * tempdir
 
@@ -423,7 +437,19 @@ Temp directory. Default C<< File::Temp::tempdir(CLEANUP => 1) >>.
 
 =head2 inject
 
+  # automatically guess $source
   $cpan->inject($source, \%option)
+
+  # or explicitly call inject_* method
+  $cpan->inject_local('/path/to//Your-Module-0.01.tar.gz'', {author => 'YOU'});
+  $cpan->inject_local_file('/path/to//Your-Module-0.01.tar.gz'', {author => 'YOU'});
+  $cpan->inject_local_directory('/path/to/cpan/dir', {author => 'YOU'});
+
+  $cpan->inject_http('http://example.com/Hoge-0.01.tar.gz', {author => 'YOU'});
+
+  $cpan->inject_git('git://github.com/skaji/Carl.git', {author => 'SKAJI'});
+
+  $cpan->inject_cpan('Plack', {version => '1.0039'});
 
 Inject C< $source > to our cpan mirror directory. C< $source > is one of
 
@@ -441,6 +467,10 @@ Inject C< $source > to our cpan mirror directory. C< $source > is one of
 =item * git url (with optional ref)
 
   $cpan->inject('git://github.com/skaji/Carl.git', { author => "SKAJI", ref => '0.114' });
+
+=item * cpan module
+
+  $cpan->inject('cpan:Plack', {version => '1.0039'});
 
 =back
 

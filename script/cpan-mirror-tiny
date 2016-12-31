@@ -21,8 +21,18 @@ cpan-mirror-tiny - CPAN::Mirror::Tiny command line interface
 
   -h, --help      show help
   -v, --version   show version
-  -b, --base      base directory, default: ./darkpan
   -a, --author    specify author, default: VENDOR
+  -b, --base      base directory,
+                  default: $ENV{PERL_CPAN_MIRROR_TINY_BASE} or ./darkpan
+
+=head1 EXAMPLES
+
+  $ cpan-mirror-tiny inject cpan:Plack
+  $ cpan-mirror-tiny inject cpan:Plack@1.0039
+  $ cpan-mirror-tiny inject --author YOU http://exmpale.com/Module-0.01.tar.gz
+  $ cpan-mirror-tiny inject --author YOU git://github.com/you/Module.git@develop
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/Module-0.01.tar.gz
+  $ cpan-mirror-tiny inject --author YOU /path/to/local/dir
 
 =head1 DESCRIPTION
 
@@ -63,12 +73,32 @@ CPAN client L<cpm>:
 
   $ cpm install --resover 02packages,file://$PWD/darkpan --resover metadb Your::Module
 
-If you want to use your darkpan in other hosts, then run a http server first:
+=head2 HTTP SERVER
+
+If you want to use your darkpan in other hosts, run a http server first:
 
   [host1]$ cpan-mirror-tiny server
   HTTP::Server::PSGI: Accepting connections at http://0:5000/
 
+Then
+
   [host2]$ cpm install --resover 02packages,http://host1:5000 --resover metadb Your::Module
+
+Moreover you can inject/upload your modules against C<http://host1:5000/upload>:
+
+=over 4
+
+=item inject git repositories
+
+  [host2]$ curl --data-urlencode 'module=git://github.com/skaji/Carl.git' \
+                --data-urlencode 'author=SKAJI' http://host1:5000/upload
+
+=item upload tarballs with L<cpan-upload>
+
+  [host2]$ export CPAN_UPLOADER_UPLOAD_URI=http://host2:5000/upload
+  [host2]$ cpan-upload --user SKAJI --password dummy /path/to/local/Module-0.01.tar.gz
+
+=back
 
 Note that C<cpan-mirror-tiny server> accepts the same options as C<plackup> such as C<--port>, C<--server>:
 

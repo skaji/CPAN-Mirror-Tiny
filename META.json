@@ -50,6 +50,7 @@
             "JSON" : "0",
             "Parse::LocalDistribution" : "0",
             "Parse::PMFile" : "0",
+            "Pod::Usage" : "1.33",
             "perl" : "5.008001"
          }
       }

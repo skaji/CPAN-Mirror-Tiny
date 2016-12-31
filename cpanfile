@@ -9,6 +9,7 @@ requires 'HTTP::Tinyish';
 requires 'JSON';
 requires 'Parse::LocalDistribution';
 requires 'Parse::PMFile';
+requires 'Pod::Usage', '1.33';
 
 recommends 'Plack';
 

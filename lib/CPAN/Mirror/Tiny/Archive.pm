@@ -33,7 +33,7 @@ sub _init {
             my $xf = ($self->{verbose} ? 'v' : '')."xf";
             my $ar = $tarfile =~ /bz2$/ ? 'j' : 'z';
 
-            my($root, @others) = `$tar ${ar}tf $tarfile`
+            my($root, @others) = `$tar ${ar}tf $tarfile 2>/dev/null`
                 or return undef;
 
             FILE: {
@@ -48,7 +48,7 @@ sub _init {
                 }
             }
 
-            system "$tar $ar$xf $tarfile";
+            system "$tar $ar$xf $tarfile 2>/dev/null";
             return $root if -d $root;
             return undef;
         };
