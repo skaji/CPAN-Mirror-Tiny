@@ -5,6 +5,7 @@ use HTTP::Tiny;
 use CPAN::Mirror::Tiny;
 use HTTP::Tinyish;
 use File::Temp 'tempdir';
+delete $ENV{PERL_CPAN_MIRROR_TINY_BASE};
 
 my $temp = tempdir CLEANUP => 1;
 !system "git clone --quiet git://github.com/skaji/Process-Pipeline $temp/dir && cd $temp/dir && git checkout --quiet 0.04" or die;
