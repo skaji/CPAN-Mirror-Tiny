@@ -4,6 +4,7 @@ use warnings;
 use CPAN::Mirror::Tiny;
 use File::Find ();
 use File::Spec;
+use File::stat ();
 use Getopt::Long ();
 use HTTP::Tinyish;
 use POSIX ();
@@ -108,17 +109,20 @@ sub cmd_list {
     my $wanted = sub {
         my $name = $_;
         return if !-f $name or $name =~ /\.json$/;
-        my $mtime = (stat $name)[9];
+        my $stat = File::stat::stat($name);
         if ($name =~ /02packages.details.txt.gz$/) {
-            $index = {name => $name, mtime => $mtime};
+            $index = {name => $name, mtime => $stat->mtime, size => $stat->size};
         } else {
-            push @dist, {name => $name, mtime => $mtime};
+            push @dist, {name => $name, mtime => $stat->mtime, size => $stat->size};
         }
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $self->{base});
 
     my $print = sub {
-        printf "%s  %s\n", POSIX::strftime("%F %T", localtime($_[0]->{mtime})), $_[0]->{name};
+        printf "%s %4dKB %s\n",
+            POSIX::strftime("%FT%T", localtime($_[0]->{mtime})),
+            $_[0]->{size} / 1024,
+            $_[0]->{name};
     };
     $print->($index) if $index;
     for my $dist (sort { $a->{name} cmp $b->{name} } @dist) {
