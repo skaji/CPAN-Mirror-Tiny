@@ -6,7 +6,6 @@ use File::Find ();
 use File::Spec;
 use File::stat ();
 use Getopt::Long ();
-use HTTP::Tinyish;
 use POSIX ();
 use Pod::Usage 1.33 ();
 
@@ -14,7 +13,6 @@ sub new {
     my $class = shift;
     bless {
         base => $ENV{PERL_CPAN_MIRROR_TINY_BASE} || "darkpan",
-        http => HTTP::Tinyish->new(agent => "CPAN::Mirror::Tiny/$CPAN::Mirror::Tiny::VERSION"),
     }, $class;
 }
 
