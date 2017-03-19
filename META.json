@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -67,8 +67,8 @@
          "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225",
+   "version" : "0.12",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.023",
    "x_static_install" : 1
 }
 

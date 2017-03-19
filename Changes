@@ -2,6 +2,10 @@ Revision history for CPAN-Mirror-Tiny
 
 {{$NEXT}}
 
+0.12  2017-03-19 14:27:29 JST
+  - Follow latest WorePAN; fix warning 'Argument "..." isn't numeric in numeric eq (==)'
+  - Show size in `cpan-mirror-tiny list`
+
 0.11  2016-12-31 16:47:17 JST
   - Add inject_cpan method
   - Improve document
