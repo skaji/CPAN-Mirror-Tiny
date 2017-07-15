@@ -1,9 +1,11 @@
 package CPAN::Mirror::Tiny::CLI;
 use strict;
 use warnings;
+use CPAN::Mirror::Tiny::Util 'WIN32';
 use CPAN::Mirror::Tiny;
 use File::Find ();
 use File::Spec;
+use File::Which ();
 use File::stat ();
 use Getopt::Long ();
 use POSIX ();
@@ -97,7 +99,9 @@ sub cmd_cat_index {
     my ($self, @argv) = @_;
     my $index = File::Spec->catfile($self->{base}, "modules", "02packages.details.txt.gz");
     return unless -f $index;
-    return !system "gzip", "--decompress", "--stdout", $index;
+    my @cmd = (File::Which::which("gzip"), "--decompress", "--stdout", $index);
+    @cmd = CPAN::Mirror::Tiny::Util::shell_quote(@cmd) if WIN32;
+    return !system @cmd;
 }
 
 sub cmd_list {

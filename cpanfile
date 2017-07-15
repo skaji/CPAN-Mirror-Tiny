@@ -10,6 +10,8 @@ requires 'JSON';
 requires 'Parse::LocalDistribution';
 requires 'Parse::PMFile';
 requires 'Pod::Usage', '1.33';
+requires 'String::ShellQuote';
+requires 'Win32::ShellQuote';
 
 recommends 'Plack';
 
