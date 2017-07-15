@@ -288,21 +288,40 @@ sub _extract_provides {
     $parser->parse($dir) || +{};
 }
 
+sub index_path {
+    my ($self, %option) = @_;
+    my $file = $self->base("modules", "02packages.details.txt");
+    $option{compress} ? "$file.gz" : $file;
+}
+
 sub index {
-    my $self = shift;
+    my ($self, %option) = @_;
     my $base = $self->base("authors", "id");
     return unless -d $base;
-    my %packages;
+
+    my @dist;
     my $wanted = sub {
         return unless -f;
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
-        my $mtime = (stat $path)[9];
-        my $provides = $self->extract_provides($path);
-        my $relative = File::Spec::Unix->abs2rel($path, $base);
-        $self->_update_packages(\%packages, $provides, $relative, $mtime);
+        push @dist, {
+            path => $path,
+            mtime => (stat $path)[9],
+            relative => File::Spec::Unix->abs2rel($path, $base),
+        };
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $base);
+
+    my %packages;
+    for my $i (0..$#dist) {
+        my $dist = $dist[$i];
+        if ($option{show_progress}) {
+            warn sprintf "%d/%d examining %s\n",
+                $i+1, scalar @dist, $dist->{relative};
+        }
+        my $provides = $self->extract_provides($dist->{path});
+        $self->_update_packages(\%packages, $provides, $dist->{relative}, $dist->{mtime});
+    }
 
     my @line;
     for my $package (sort { lc $a cmp lc $b } keys %packages) {
@@ -316,12 +335,12 @@ sub index {
 
 sub write_index {
     my ($self, %option) = @_;
-    my $file = $self->base("modules", "02packages.details.txt");
+    my $file = $self->index_path;
     my $dir  = File::Basename::dirname($file);
     File::Path::mkpath($dir) unless -d $dir;
     open my $fh, ">", "$file.tmp" or die "Couldn't open $file: $!";
     printf {$fh} "Written-By: %s %s\n\n", ref $self, $self->VERSION;
-    print {$fh} $self->index;
+    print {$fh} $self->index(%option);
     close $fh;
     if ($option{compress}) {
         my (undef, $err, $exit) = safe_system(
