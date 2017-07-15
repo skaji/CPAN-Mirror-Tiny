@@ -7,5 +7,5 @@ perl:
 install:
   - curl -sSL --compressed https://git.io/cpm | perl - install -g --with-develop
 script:
-  - yath -l t
+  - yath -l t xt
 sudo: false
