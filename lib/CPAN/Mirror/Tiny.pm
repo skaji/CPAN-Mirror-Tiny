@@ -63,7 +63,7 @@ sub pushd_tempdir { CPAN::Mirror::Tiny::Tempdir->pushd(shift->{tempdir}) }
 sub _author_dir {
     my ($self, $author) = @_;
     my ($a2, $a1) = $author =~ /^((.).)/;
-    $self->base("authors/id/$a1/$a2/$author");
+    $self->base("authors", "id", $a1, $a2, $author);
 }
 
 sub _locate_tarball {
@@ -167,7 +167,7 @@ sub inject_http {
     }
     my $basename = File::Basename::basename($url);
     my $tempdir = $self->tempdir;
-    my $file = "$tempdir/$basename";
+    my $file = File::Spec->catfile($tempdir, $basename);
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
         my $author = ($option ||= {})->{author};
@@ -279,7 +279,7 @@ sub _extract_provides {
 
 sub index {
     my $self = shift;
-    my $base = $self->base("authors/id");
+    my $base = $self->base("authors", "id");
     return unless -d $base;
     my %packages;
     my $wanted = sub {
