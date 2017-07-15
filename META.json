@@ -69,7 +69,7 @@
          "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
-   "version" : "0.12",
+   "version" : "0.20",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
