@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/skaji/CPAN-Mirror-Tiny.svg?branch=master)](https://travis-ci.org/skaji/CPAN-Mirror-Tiny)
+[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/skaji/CPAN-Mirror-Tiny?branch=master&svg=true)](https://ci.appveyor.com/project/skaji/CPAN-Mirror-Tiny)
 
 # NAME
 
