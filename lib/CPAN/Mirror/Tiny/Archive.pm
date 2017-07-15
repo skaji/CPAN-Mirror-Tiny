@@ -2,36 +2,13 @@ package CPAN::Mirror::Tiny::Archive;
 use strict;
 use warnings;
 
+use CPAN::Mirror::Tiny::Util qw(WIN32 safe_system);
+
 use File::Which 'which';
 use constant BAD_TAR => ($^O eq 'solaris' || $^O eq 'hpux');
-use constant WIN32 => $^O eq 'MSWin32';
 
 use File::pushd ();
 use File::Basename ();
-
-if (WIN32) {
-    require Win32::ShellQuote;
-    *shell_quote = \&Win32::ShellQuote::quote_native;
-} else {
-    require String::ShellQuote;
-    *shell_quote = \&String::ShellQuote::shell_quote_best_effort;
-}
-sub safe_string {
-    join ' ', map { ref $_ ? shell_quote(@$_) : $_ } @_;
-}
-sub safe_system {
-    if (!WIN32 && @_ == 1 && ref $_[0]) {
-        system { $_[0][0] } @{$_[0]};
-    } else {
-        my $cmd = safe_string @_;
-        system $cmd;
-    }
-}
-sub safe_capture {
-    my $cmd = safe_string @_;
-    `$cmd`;
-}
-
 
 sub new {
     my $class = shift;
@@ -47,25 +24,25 @@ sub _init {
     my $self = shift;
     my $tar = which('tar');
     my $tar_ver;
-    my $maybe_bad_tar = sub { WIN32 || BAD_TAR
-        || (($tar_ver = safe_capture([$tar, "--version"], "2>/dev/null")) =~ /GNU.*1\.13/i) };
+    my $maybe_bad_tar = sub {
+        return 1 if WIN32 || BAD_TAR;
+        ($tar_ver) = safe_system([$tar, "--version"]);
+        $tar_ver =~ /GNU.*1\.13/i;
+    };
 
     if ($tar && !$maybe_bad_tar->()) {
         chomp $tar_ver;
-        # https://github.com/miyagawa/cpanminus/pull/508
-        my @nowarn = $tar_ver =~ /GNU\D+(\d+\.\d+)/ && $1 >= 1.23
-            ? qw(--warning=no-unknown-keyword) : ();
         $self->{_backends}{untar} = sub {
             my($self, $tarfile) = @_;
 
             my $xf = ($self->{verbose} ? 'v' : '')."xf";
             my $ar = $tarfile =~ /bz2$/ ? 'j' : 'z';
 
-            my($root, @others) = safe_capture([$tar, @nowarn, "-${ar}tf", $tarfile])
+            my ($out) = safe_system([$tar, "${ar}tf", $tarfile]);
+            my($root, @others) = split /\n/, $out
                 or return undef;
 
             FILE: {
-                chomp $root;
                 $root =~ s!^\./!!;
                 $root =~ s{^(.+?)/.*$}{$1};
 
@@ -76,7 +53,7 @@ sub _init {
                 }
             }
 
-            safe_system([$tar, @nowarn, "-$ar$xf", $tarfile]);
+            safe_system([$tar, "$ar$xf", $tarfile]);
             return $root if -d $root;
             return undef;
         };
@@ -89,11 +66,11 @@ sub _init {
             my $x  = "x" . ($self->{verbose} ? 'v' : '') . "f";
             my $ar = $tarfile =~ /bz2$/ ? $bzip2 : $gzip;
 
-            my($root, @others) = safe_capture([$ar, "-dc", $tarfile], "|", [$tar, "tf", "-"])
+            my ($out) = safe_system([$ar, "-dc", $tarfile], "|", [$tar, "tf", "-"]);
+            my($root, @others) = split /\n/, $out
                 or return undef;
 
             FILE: {
-                chomp $root;
                 $root =~ s!^\./!!;
                 $root =~ s{^(.+?)/.*$}{$1};
 
@@ -137,7 +114,8 @@ sub _init {
             my($self, $zipfile) = @_;
 
             my @opt = $self->{verbose} ? () : qw(-q);
-            my(undef, $root, @others) = safe_capture([$unzip, "-t", $zipfile])
+            my $out = safe_system([$unzip, "-t", $zipfile]);
+            my(undef, $root, @others) = split /\n/, $out
                 or return undef;
 
             chomp $root;
