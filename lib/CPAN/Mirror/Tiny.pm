@@ -173,7 +173,7 @@ sub inject_http {
     }
     my $basename = File::Basename::basename($url);
     my $tempdir = $self->tempdir;
-    my $file = File::Spec->catfile($tempdir, $basename);
+    my $file = File::Spec->catfile($tempdir->as_string, $basename);
     my $res = $self->http->mirror($url => $file);
     if ($res->{success}) {
         my $author = ($option ||= {})->{author};
