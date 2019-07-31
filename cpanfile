@@ -12,6 +12,10 @@ requires 'Parse::PMFile';
 requires 'Pod::Usage', '1.33';
 requires 'String::ShellQuote';
 requires 'Win32::ShellQuote';
+requires 'Plack::App::Directory';
+requires 'Plack::Builder';
+requires 'Plack::Request';
+requires 'Plack::Runner';
 
 recommends 'Plack';
 
