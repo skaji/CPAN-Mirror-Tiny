@@ -31,7 +31,7 @@ sub uploader {
                 my $tempdir = $cpan->tempdir;
                 if (my $upload = $req->upload('pause99_add_uri_httpupload')) {
                     # request from CPAN::Uploader
-                    $module = File::Spec->catfile($tempdir, $upload->filename);
+                    $module = File::Spec->catfile($tempdir->as_string, $upload->filename);
                     File::Copy::move $upload->tempname, $module;
                     $author = $req->param('HIDDENNAME');
                 } else {
