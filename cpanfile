@@ -16,5 +16,5 @@ requires 'Win32::ShellQuote';
 recommends 'Plack';
 
 on develop => sub {
-    requires 'Test2::Harness';
+    requires 'Test::More', '0.98';
 };

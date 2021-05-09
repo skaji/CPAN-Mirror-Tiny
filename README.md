@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/skaji/CPAN-Mirror-Tiny.svg?branch=master)](https://travis-ci.org/skaji/CPAN-Mirror-Tiny)
-[![AppVeyor Status](https://ci.appveyor.com/api/projects/status/github/skaji/CPAN-Mirror-Tiny?branch=master&svg=true)](https://ci.appveyor.com/project/skaji/CPAN-Mirror-Tiny)
+[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/linux/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
 
 # NAME
 
@@ -30,7 +29,7 @@ There is also a command line interface [cpan-mirror-tiny](https://metacpan.org/p
 
 Yes, we already have great CPAN modules which create CPAN mirror.
 
-[CPAN::Mini](https://metacpan.org/pod/CPAN::Mini), [OrePAN2](https://metacpan.org/pod/OrePAN2), [WorePAN](https://metacpan.org/pod/WorePAN) ...
+[CPAN::Mini](https://metacpan.org/pod/CPAN%3A%3AMini), [OrePAN2](https://metacpan.org/pod/OrePAN2), [WorePAN](https://metacpan.org/pod/WorePAN) ...
 
 I want to use such modules in CPAN clients.
 Actually I used OrePAN2 in [Carl](https://github.com/skaji/Carl),
