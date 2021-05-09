@@ -42,7 +42,6 @@
          },
          "requires" : {
             "CPAN::Meta" : "0",
-            "Capture::Tiny" : "0",
             "File::Copy::Recursive" : "0",
             "File::Which" : "0",
             "File::pushd" : "0",
@@ -52,8 +51,6 @@
             "Parse::LocalDistribution" : "0",
             "Parse::PMFile" : "0",
             "Pod::Usage" : "1.33",
-            "String::ShellQuote" : "0",
-            "Win32::ShellQuote" : "0",
             "perl" : "5.008001"
          }
       }
@@ -74,9 +71,6 @@
       },
       "CPAN::Mirror::Tiny::Tempdir" : {
          "file" : "lib/CPAN/Mirror/Tiny/Tempdir.pm"
-      },
-      "CPAN::Mirror::Tiny::Util" : {
-         "file" : "lib/CPAN/Mirror/Tiny/Util.pm"
       }
    },
    "release_status" : "stable",

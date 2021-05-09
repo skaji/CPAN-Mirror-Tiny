@@ -3,13 +3,15 @@ use warnings;
 use Test::More;
 use HTTP::Tiny;
 use CPAN::Mirror::Tiny;
-use CPAN::Mirror::Tiny::Util 'safe_system';
+use IPC::Run3 ();
 use HTTP::Tinyish;
 use File::Temp 'tempdir';
 delete $ENV{PERL_CPAN_MIRROR_TINY_BASE};
 
 my $temp = tempdir CLEANUP => 1;
-safe_system [qw(git clone --quiet -b 0.04 git://github.com/skaji/Process-Pipeline), "$temp/dir"];
+IPC::Run3::run3 [qw(git clone --quiet -b 0.04 git://github.com/skaji/Process-Pipeline), "$temp/dir"],
+    undef, undef, \undef;
+die if $? != 0;
 my $res = HTTP::Tinyish->new->mirror("https://cpan.metacpan.org/authors/id/S/SK/SKAJI/Mojo-SlackRTM-0.02.tar.gz" => "$temp/hoge.tar.gz");
 $res->{success} or die;
 
