@@ -535,7 +535,7 @@ or C< base/modules/02packages.details.txt.gz >.
 
 =head2 How can I install modules in my DarkPAN with cpanm / cpm?
 
-L<cpanm> is an awesome CPAN clients. If you want to install modules
+L<cpanm> is an awesome CPAN client. If you want to install modules
 in your DarkPAN with cpanm, there are 2 ways.
 
 First way:

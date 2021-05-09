@@ -1,4 +1,5 @@
 [![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/linux/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
+[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/windows/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
 
 # NAME
 
@@ -116,7 +117,7 @@ or ` base/modules/02packages.details.txt.gz `.
 
 ## How can I install modules in my DarkPAN with cpanm / cpm?
 
-[cpanm](https://metacpan.org/pod/cpanm) is an awesome CPAN clients. If you want to install modules
+[cpanm](https://metacpan.org/pod/cpanm) is an awesome CPAN client. If you want to install modules
 in your DarkPAN with cpanm, there are 2 ways.
 
 First way:
