@@ -6,6 +6,7 @@ requires 'File::Copy::Recursive';
 requires 'File::Which';
 requires 'File::pushd';
 requires 'HTTP::Tinyish';
+requires 'IPC::Run3';
 requires 'JSON';
 requires 'Parse::LocalDistribution';
 requires 'Parse::PMFile';

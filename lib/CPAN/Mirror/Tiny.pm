@@ -59,8 +59,7 @@ sub http { shift->{http} }
 
 sub extract {
     my ($self, $path) = @_;
-    my $method = $path =~ /\.zip$/ ? "unzip" : "untar";
-    $self->archive->$method($path);
+    $self->archive->unpack($path);
 }
 
 sub base {
