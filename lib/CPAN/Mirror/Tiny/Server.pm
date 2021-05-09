@@ -88,13 +88,16 @@ CPAN::Mirror::Tiny::Server - HTTP Server for CPAN::Mirror::Tiny
 
 =head1 SYNOPSIS
 
-  $ cpan-mirror-server ./repository
+  $ cpan-mirror-tiny server
 
   # upload git managed module
   $ curl --data-urlencode 'module=git@github.com:Songmu/p5-App-RunCron.git' \
     --data-urlencode 'author=SONGMU' http://localhost:5000/upload
   $ curl --data-urlencode 'module=ssh://git@mygit/home/git/repos/MyModule.git' \
     --data-urlencode 'author=SONGMU' http://localhost:5000/upload
+
+  # install by cpm
+  $ cpm install --resolver 02packages,http://localhost:5000 --resolver metadb Your::Module
 
   # install by cpanm
   $ cpanm --mirror http://localhost:5000 --mirror http://www.cpan.org Your::Module
