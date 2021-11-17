@@ -58,7 +58,7 @@
    "provides" : {
       "CPAN::Mirror::Tiny" : {
          "file" : "lib/CPAN/Mirror/Tiny.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       },
       "CPAN::Mirror::Tiny::Archive" : {
          "file" : "lib/CPAN/Mirror/Tiny/Archive.pm"
@@ -85,7 +85,7 @@
          "web" : "https://github.com/skaji/CPAN-Mirror-Tiny"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
