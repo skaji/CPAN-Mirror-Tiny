@@ -1,5 +1,4 @@
-[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/linux/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
-[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/windows/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
+[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/workflows/test/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
 
 # NAME
 
