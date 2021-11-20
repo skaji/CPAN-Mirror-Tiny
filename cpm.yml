@@ -1,0 +1,19 @@
+prereqs:
+  runtime:
+    requires:
+      CPAN::Meta:
+      File::Copy::Recursive:
+      File::Which:
+      File::pushd:
+      HTTP::Tinyish:
+      IPC::Run3:
+      JSON:
+      Parse::LocalDistribution:
+      Parse::PMFile:
+      Pod::Usage: { version: '1.33' }
+      perl: { version: '5.008001' }
+    recommends:
+      Plack:
+  develop:
+    requires:
+      Test::More: { version: '0.98' }
