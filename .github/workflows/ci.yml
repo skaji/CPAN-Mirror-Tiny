@@ -23,6 +23,8 @@ jobs:
           curl -fsSL https://github.com/skaji/cpm-test/releases/download/0.01/ubuntu-24.04-perl-${{ matrix.perl-version }}.tar.xz | tar xJf - -C /tmp
           echo /tmp/perl-${{ matrix.perl-version }}/bin >> $GITHUB_PATH
       - run: perl -V
+      - name: Install cpanminus
+        run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g App::cpanminus
       - name: Install Dependencies
         run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | perl - install -g --top-level-phase runtime,test,develop --top-level-relationship requires,recommends --show-build-log-on-failure
       - run: prove -lr t xt
@@ -31,6 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - run: /usr/bin/perl -V
+      - name: Install cpanminus
+        run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | sudo -H /usr/bin/perl - install -g App::cpanminus
       - name: Install Dependencies
         run: curl -fsSL https://raw.githubusercontent.com/skaji/cpm/main/cpm | sudo -H /usr/bin/perl - install -g --top-level-phase runtime,test,develop --top-level-relationship requires,recommends --show-build-log-on-failure
       - run: /usr/bin/prove -lr t xt
