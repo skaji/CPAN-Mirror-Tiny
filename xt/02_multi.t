@@ -1,5 +1,6 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Test::More;
 use HTTP::Tiny;
 use CPAN::Mirror::Tiny;
@@ -15,7 +16,7 @@ my $dist3 = "$base/authors/id/S/SK/SKAJI/Distribution-Metadata-0.03.tar.gz";
 my $dist4 = "$base/authors/id/S/SK/SKAJI/Distribution-Metadata-0.04.tar.gz";
 my $now = time;
 
-subtest test1 => sub {
+subtest test1 => sub (@) {
     utime $now - 5, $now - 5, $dist3;
     utime $now - 0, $now - 0, $dist4;
     my $index = $cpan->index;
@@ -24,7 +25,7 @@ subtest test1 => sub {
     like $index, qr/Distribution::Metadata::Factory\s+undef.*0.04/;
     unlike $index, qr/Distribution::Metadata\s+0.03/;
 };
-subtest test2 => sub {
+subtest test2 => sub (@) {
     utime $now - 5, $now - 5, $dist4;
     utime $now - 0, $now - 0, $dist3;
     my $index = $cpan->index;

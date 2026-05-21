@@ -1,5 +1,3 @@
-[![Actions Status](https://github.com/skaji/CPAN-Mirror-Tiny/actions/workflows/test.yml/badge.svg)](https://github.com/skaji/CPAN-Mirror-Tiny/actions)
-
 # NAME
 
 CPAN::Mirror::Tiny - create partial CPAN mirror (a.k.a. DarkPAN)
@@ -137,6 +135,13 @@ Second way:
 If you use [cpm](https://metacpan.org/pod/cpm), then:
 
     cpm install -r 02packages,file:///path/to/drakpan -r metadb Your::Module
+
+# ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+[https://github.com/skaji/CPAN-Mirror-Tiny/attestations](https://github.com/skaji/CPAN-Mirror-Tiny/attestations)
 
 # COPYRIGHT AND LICENSE
 
