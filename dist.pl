@@ -29,7 +29,6 @@ my @prereq = (
         'Module::Build::Tiny' => '0.053',
     ],
     [ Prereqs => 'RuntimeRequires' ] => [
-        '1.33' => '0',
         'CPAN::Meta' => '0',
         'File::Copy::Recursive' => '0',
         'File::Which' => '0',
@@ -39,9 +38,8 @@ my @prereq = (
         'JSON' => '0',
         'Parse::LocalDistribution' => '0',
         'Parse::PMFile' => '0',
-        'Pod::Usage' => '0',
-        'perl' => '0',
-        'v5.24' => '0',
+        'Pod::Usage' => '1.33',
+        'perl' => 'v5.24',
     ],
     [ Prereqs => 'RuntimeRecommends' ] => [
         'Plack' => '0',
